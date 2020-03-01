@@ -86,15 +86,163 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./js/src/cartWatcher.js":
+/*!*******************************!*\
+  !*** ./js/src/cartWatcher.js ***!
+  \*******************************/
+/*! exports provided: cartWatcher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cartWatcher", function() { return cartWatcher; });
+function cartWatcher(params) {
+    return track => {
+        jQuery(document.body).on(
+            'adding_to_cart',
+            (event, button, data) => {
+                console.log(data);
+                track('contentView', {
+                    contentType: "Product",
+                    currency: params().currency,
+                    id: data.product_id,
+                    name: '', // TODO
+                    quantity: data.quantity,
+                    totalItemPrice: '', // TODO
+                    unit: 'piece',
+                    unitPrice: '' // TODO
+                });
+            }
+        );
+    }
+}
+
+
+/***/ }),
+
+/***/ "./js/src/consentWatcher.js":
+/*!**********************************!*\
+  !*** ./js/src/consentWatcher.js ***!
+  \**********************************/
+/*! exports provided: consentWatcher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "consentWatcher", function() { return consentWatcher; });
+function consentWatcher(consent) {
+    document.addEventListener('setCookieNotice', (event) => {
+        if (event.detail.value) {
+            consent('grantConsent');
+        } else {
+            consent('rejectConsent');
+        }
+    });
+}
+
+
+/***/ }),
+
 /***/ "./js/src/index.js":
 /*!*************************!*\
   !*** ./js/src/index.js ***!
   \*************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _consentWatcher__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./consentWatcher */ "./js/src/consentWatcher.js");
+/* harmony import */ var _cartWatcher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./cartWatcher */ "./js/src/cartWatcher.js");
+/* harmony import */ var _productWatcher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./productWatcher */ "./js/src/productWatcher.js");
+/* harmony import */ var _purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./purchasedOrderWatcher */ "./js/src/purchasedOrderWatcher.js");
 
 
-console.log("I'm alive");
+
+
+
+window.addEventListener('load', init);
+
+function init() {
+    if (bp == null) {
+        console.warn('bp object is not present: Barion Pixel is not loaded.');
+        return;
+    }
+
+    Object(_consentWatcher__WEBPACK_IMPORTED_MODULE_0__["consentWatcher"])(consent);
+    Object(_cartWatcher__WEBPACK_IMPORTED_MODULE_1__["cartWatcher"])()(track);
+    Object(_productWatcher__WEBPACK_IMPORTED_MODULE_2__["productWatcher"])()(track);
+    Object(_purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__["purchasedOrderWatcher"])()(track);
+}
+
+function track(eventName, properties) {
+    bp('track', eventName, properties);
+}
+
+function consent(grant) {
+    bp('consent', grant);
+}
+
+
+/***/ }),
+
+/***/ "./js/src/productWatcher.js":
+/*!**********************************!*\
+  !*** ./js/src/productWatcher.js ***!
+  \**********************************/
+/*! exports provided: productWatcher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "productWatcher", function() { return productWatcher; });
+function productWatcher() {
+    return track => {
+        if (typeof barionPixelParams === 'undefined') {
+            return;
+        }
+
+        if (barionPixelParams.product == null) {
+            return;
+        }
+
+        track('contentView', {
+            contentType: 'Product',
+            currency: barionPixelParams.currency,
+            ...barionPixelParams.product
+        });
+    };
+}
+
+
+/***/ }),
+
+/***/ "./js/src/purchasedOrderWatcher.js":
+/*!*****************************************!*\
+  !*** ./js/src/purchasedOrderWatcher.js ***!
+  \*****************************************/
+/*! exports provided: purchasedOrderWatcher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "purchasedOrderWatcher", function() { return purchasedOrderWatcher; });
+function purchasedOrderWatcher() {
+    return track => {
+        if (typeof barionPixelParams === 'undefined') {
+            return;
+        }
+
+        if (barionPixelParams.purchasedOrder == null) {
+            return;
+        }
+
+        track('purchase', {
+            currency: barionPixelParams.currency,
+            ...barionPixelParams.purchasedOrder
+        });
+    };
+}
 
 
 /***/ })
