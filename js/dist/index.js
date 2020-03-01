@@ -182,6 +182,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./placeOrderWatcher */ "./js/src/placeOrderWatcher.js");
 /* harmony import */ var _setUserProperties__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./setUserProperties */ "./js/src/setUserProperties.js");
 /* harmony import */ var _myAccountWatcher__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./myAccountWatcher */ "./js/src/myAccountWatcher.js");
+/* harmony import */ var _variationWatcher__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./variationWatcher */ "./js/src/variationWatcher.js");
+
 
 
 
@@ -209,6 +211,7 @@ function init() {
     Object(_initCheckoutWatcher__WEBPACK_IMPORTED_MODULE_4__["initCheckoutWatcher"])(params)(track);
     Object(_placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__["placeOrderWatcher"])(params, trackSetUserProperties, trackAccountRegister)(track);
     Object(_myAccountWatcher__WEBPACK_IMPORTED_MODULE_7__["myAccountWatcher"])(params, trackSetUserProperties)(track);
+    Object(_variationWatcher__WEBPACK_IMPORTED_MODULE_8__["variationWatcher"])(params)(track);
 }
 
 
@@ -515,6 +518,40 @@ const setUserProperties = (track) => async (userProperties) => {
 
     await track('setUserProperties', userProperties);
 };
+
+
+/***/ }),
+
+/***/ "./js/src/variationWatcher.js":
+/*!************************************!*\
+  !*** ./js/src/variationWatcher.js ***!
+  \************************************/
+/*! exports provided: variationWatcher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "variationWatcher", function() { return variationWatcher; });
+function variationWatcher(params) {
+    return track => {
+        let { currency, product } = params();
+
+        jQuery('.variations_form').each((i, form) => {
+            let $form = jQuery(form);
+            
+            $form.on('woocommerce_variation_has_changed', () => {
+                let variant = $form.find('select').val();
+
+                track('customizeProduct', {
+                    contentType: 'Product',
+                    currency,
+                    ...product,
+                    variant
+                });
+            });
+        });
+    };
+}
 
 
 /***/ })
