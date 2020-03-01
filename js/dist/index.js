@@ -157,6 +157,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./purchasedOrderWatcher */ "./js/src/purchasedOrderWatcher.js");
 /* harmony import */ var _initCheckoutWatcher__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./initCheckoutWatcher */ "./js/src/initCheckoutWatcher.js");
 /* harmony import */ var _placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./placeOrderWatcher */ "./js/src/placeOrderWatcher.js");
+/* harmony import */ var _setUserProperties__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./setUserProperties */ "./js/src/setUserProperties.js");
+
 
 
 
@@ -172,12 +174,13 @@ function init() {
         return;
     }
 
+    let trackSetUserProperties = Object(_setUserProperties__WEBPACK_IMPORTED_MODULE_6__["setUserProperties"])(track);
     Object(_consentWatcher__WEBPACK_IMPORTED_MODULE_0__["consentWatcher"])(consent);
     Object(_cartWatcher__WEBPACK_IMPORTED_MODULE_1__["cartWatcher"])(params)(track);
     Object(_productWatcher__WEBPACK_IMPORTED_MODULE_2__["productWatcher"])()(track);
     Object(_purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__["purchasedOrderWatcher"])()(track);
     Object(_initCheckoutWatcher__WEBPACK_IMPORTED_MODULE_4__["initCheckoutWatcher"])(params)(track);
-    Object(_placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__["placeOrderWatcher"])(params)(track);
+    Object(_placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__["placeOrderWatcher"])(params, trackSetUserProperties)(track);
 }
 
 function track(eventName, properties) {
@@ -244,7 +247,7 @@ function initCheckoutWatcher(params) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "placeOrderWatcher", function() { return placeOrderWatcher; });
-function placeOrderWatcher(params) {
+function placeOrderWatcher(params, trackSetUserProperties) {
     return track => {
         let cart = params().cart;
 
@@ -252,18 +255,45 @@ function placeOrderWatcher(params) {
             return;
         }
 
-        let placeOrderButton = document.getElementById('place_order');
+        let checkoutForm = document.querySelector('form[name="checkout"]');
 
-        if (placeOrderButton == null) {
+        if (checkoutForm == null) {
             return;
         }
 
-        placeOrderButton.addEventListener('click', () => {
+        checkoutForm.addEventListener('submit', () => {
+            debugger
+            trackSetUserProperties(getUserProperties());
             track('initiatePurchase', {
                 currency: params().currency,
                 ...cart
             });
         });
+
+        function getUserProperties() {
+            if (!isAccountCreating()) {
+                return null;
+            }
+
+            let usernameField = document.getElementById('account_username');
+            let emailField = document.getElementById('billing_email');
+
+            if (usernameField != null && usernameField.value) {
+                return {
+                    userId: usernameField.value
+                };
+            }
+
+            return {
+                userId: emailField.value
+            };
+        }
+
+        function isAccountCreating() {
+            let createAccountCheckbox = document.getElementById('createaccount');
+
+            return createAccountCheckbox != null && createAccountCheckbox.checked;
+        }
     }
 }
 
@@ -327,6 +357,27 @@ function purchasedOrderWatcher() {
         });
     };
 }
+
+
+/***/ }),
+
+/***/ "./js/src/setUserProperties.js":
+/*!*************************************!*\
+  !*** ./js/src/setUserProperties.js ***!
+  \*************************************/
+/*! exports provided: setUserProperties */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setUserProperties", function() { return setUserProperties; });
+const setUserProperties = (track) => (userProperties) => {
+    if (userProperties == null) {
+        return;
+    }
+
+    track('setUserProperties', userProperties);
+};
 
 
 /***/ })

@@ -1,4 +1,4 @@
-export function placeOrderWatcher(params) {
+export function placeOrderWatcher(params, trackSetUserProperties) {
     return track => {
         let cart = params().cart;
 
@@ -6,17 +6,44 @@ export function placeOrderWatcher(params) {
             return;
         }
 
-        let placeOrderButton = document.getElementById('place_order');
+        let checkoutForm = document.querySelector('form[name="checkout"]');
 
-        if (placeOrderButton == null) {
+        if (checkoutForm == null) {
             return;
         }
 
-        placeOrderButton.addEventListener('click', () => {
+        checkoutForm.addEventListener('submit', () => {
+            debugger
+            trackSetUserProperties(getUserProperties());
             track('initiatePurchase', {
                 currency: params().currency,
                 ...cart
             });
         });
+
+        function getUserProperties() {
+            if (!isAccountCreating()) {
+                return null;
+            }
+
+            let usernameField = document.getElementById('account_username');
+            let emailField = document.getElementById('billing_email');
+
+            if (usernameField != null && usernameField.value) {
+                return {
+                    userId: usernameField.value
+                };
+            }
+
+            return {
+                userId: emailField.value
+            };
+        }
+
+        function isAccountCreating() {
+            let createAccountCheckbox = document.getElementById('createaccount');
+
+            return createAccountCheckbox != null && createAccountCheckbox.checked;
+        }
     }
 }
