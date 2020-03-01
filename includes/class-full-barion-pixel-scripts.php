@@ -46,6 +46,10 @@ class Full_Barion_Pixel_Scripts {
             $this->add_cart($params);
         }
 
+        if(is_checkout()) {
+            $this->add_cart($params);
+        }
+
         wp_localize_script('full_barion_pixel', 'barionPixelParams', $params);
     }
 

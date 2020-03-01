@@ -11,7 +11,7 @@ export function initCheckoutWatcher(params) {
                 e.preventDefault();
 
                 await track('initiateCheckout', {
-                    currency: barionPixelParams.currency,
+                    currency: params().currency,
                     ...cart
                 });
 

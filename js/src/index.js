@@ -3,6 +3,7 @@ import { cartWatcher } from './cartWatcher'
 import { productWatcher } from "./productWatcher";
 import { purchasedOrderWatcher } from "./purchasedOrderWatcher";
 import { initCheckoutWatcher } from "./initCheckoutWatcher";
+import { placeOrderWatcher } from "./placeOrderWatcher";
 
 window.addEventListener('load', init);
 
@@ -17,6 +18,7 @@ function init() {
     productWatcher()(track);
     purchasedOrderWatcher()(track);
     initCheckoutWatcher(params)(track);
+    placeOrderWatcher(params)(track);
 }
 
 function track(eventName, properties) {

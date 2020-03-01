@@ -156,6 +156,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _productWatcher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./productWatcher */ "./js/src/productWatcher.js");
 /* harmony import */ var _purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./purchasedOrderWatcher */ "./js/src/purchasedOrderWatcher.js");
 /* harmony import */ var _initCheckoutWatcher__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./initCheckoutWatcher */ "./js/src/initCheckoutWatcher.js");
+/* harmony import */ var _placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./placeOrderWatcher */ "./js/src/placeOrderWatcher.js");
+
 
 
 
@@ -175,6 +177,7 @@ function init() {
     Object(_productWatcher__WEBPACK_IMPORTED_MODULE_2__["productWatcher"])()(track);
     Object(_purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__["purchasedOrderWatcher"])()(track);
     Object(_initCheckoutWatcher__WEBPACK_IMPORTED_MODULE_4__["initCheckoutWatcher"])(params)(track);
+    Object(_placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__["placeOrderWatcher"])(params)(track);
 }
 
 function track(eventName, properties) {
@@ -219,13 +222,49 @@ function initCheckoutWatcher(params) {
                 e.preventDefault();
 
                 await track('initiateCheckout', {
-                    currency: barionPixelParams.currency,
+                    currency: params().currency,
                     ...cart
                 });
 
                 window.location = e.target.href;
             }));
     };
+}
+
+
+/***/ }),
+
+/***/ "./js/src/placeOrderWatcher.js":
+/*!*************************************!*\
+  !*** ./js/src/placeOrderWatcher.js ***!
+  \*************************************/
+/*! exports provided: placeOrderWatcher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "placeOrderWatcher", function() { return placeOrderWatcher; });
+function placeOrderWatcher(params) {
+    return track => {
+        let cart = params().cart;
+
+        if (cart == null) {
+            return;
+        }
+
+        let placeOrderButton = document.getElementById('place_order');
+
+        if (placeOrderButton == null) {
+            return;
+        }
+
+        placeOrderButton.addEventListener('click', () => {
+            track('initiatePurchase', {
+                currency: params().currency,
+                ...cart
+            });
+        });
+    }
 }
 
 
