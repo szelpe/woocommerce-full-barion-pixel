@@ -1,7 +1,7 @@
-export const setUserProperties = (track) => (userProperties) => {
+export const setUserProperties = (track) => async (userProperties) => {
     if (userProperties == null) {
         return;
     }
 
-    track('setUserProperties', userProperties);
+    await track('setUserProperties', userProperties);
 };

@@ -1,4 +1,4 @@
-export function placeOrderWatcher(params, trackSetUserProperties) {
+export function placeOrderWatcher(params, trackSetUserProperties, trackAccountRegister) {
     return track => {
         let cart = params().cart;
 
@@ -13,8 +13,8 @@ export function placeOrderWatcher(params, trackSetUserProperties) {
         }
 
         checkoutForm.addEventListener('submit', () => {
-            debugger
             trackSetUserProperties(getUserProperties());
+            trackAccountRegister('checkout');
             track('initiatePurchase', {
                 currency: params().currency,
                 ...cart

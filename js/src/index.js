@@ -5,6 +5,7 @@ import { purchasedOrderWatcher } from "./purchasedOrderWatcher";
 import { initCheckoutWatcher } from "./initCheckoutWatcher";
 import { placeOrderWatcher } from "./placeOrderWatcher";
 import { setUserProperties } from "./setUserProperties";
+import { myAccountWatcher, accountRegister } from "./myAccountWatcher";
 
 window.addEventListener('load', init);
 
@@ -15,13 +16,17 @@ function init() {
     }
 
     let trackSetUserProperties = setUserProperties(track);
+    let trackAccountRegister = accountRegister(track);
+
     consentWatcher(consent);
     cartWatcher(params)(track);
     productWatcher()(track);
     purchasedOrderWatcher()(track);
     initCheckoutWatcher(params)(track);
-    placeOrderWatcher(params, trackSetUserProperties)(track);
+    placeOrderWatcher(params, trackSetUserProperties, trackAccountRegister)(track);
+    myAccountWatcher(params, trackSetUserProperties)(track);
 }
+
 
 function track(eventName, properties) {
     bp('track', eventName, properties);

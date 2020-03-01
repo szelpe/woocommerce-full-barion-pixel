@@ -158,6 +158,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _initCheckoutWatcher__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./initCheckoutWatcher */ "./js/src/initCheckoutWatcher.js");
 /* harmony import */ var _placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./placeOrderWatcher */ "./js/src/placeOrderWatcher.js");
 /* harmony import */ var _setUserProperties__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./setUserProperties */ "./js/src/setUserProperties.js");
+/* harmony import */ var _myAccountWatcher__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./myAccountWatcher */ "./js/src/myAccountWatcher.js");
+
 
 
 
@@ -175,13 +177,17 @@ function init() {
     }
 
     let trackSetUserProperties = Object(_setUserProperties__WEBPACK_IMPORTED_MODULE_6__["setUserProperties"])(track);
+    let trackAccountRegister = Object(_myAccountWatcher__WEBPACK_IMPORTED_MODULE_7__["accountRegister"])(track);
+
     Object(_consentWatcher__WEBPACK_IMPORTED_MODULE_0__["consentWatcher"])(consent);
     Object(_cartWatcher__WEBPACK_IMPORTED_MODULE_1__["cartWatcher"])(params)(track);
     Object(_productWatcher__WEBPACK_IMPORTED_MODULE_2__["productWatcher"])()(track);
     Object(_purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__["purchasedOrderWatcher"])()(track);
     Object(_initCheckoutWatcher__WEBPACK_IMPORTED_MODULE_4__["initCheckoutWatcher"])(params)(track);
-    Object(_placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__["placeOrderWatcher"])(params, trackSetUserProperties)(track);
+    Object(_placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__["placeOrderWatcher"])(params, trackSetUserProperties, trackAccountRegister)(track);
+    Object(_myAccountWatcher__WEBPACK_IMPORTED_MODULE_7__["myAccountWatcher"])(params, trackSetUserProperties)(track);
 }
+
 
 function track(eventName, properties) {
     bp('track', eventName, properties);
@@ -237,6 +243,85 @@ function initCheckoutWatcher(params) {
 
 /***/ }),
 
+/***/ "./js/src/myAccountWatcher.js":
+/*!************************************!*\
+  !*** ./js/src/myAccountWatcher.js ***!
+  \************************************/
+/*! exports provided: myAccountWatcher, accountRegister */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "myAccountWatcher", function() { return myAccountWatcher; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "accountRegister", function() { return accountRegister; });
+function myAccountWatcher(params, trackSetUserProperties) {
+    return track => {
+        watchRegister();
+        watchLogin();
+
+        function watchRegister() {
+            let registerForm = document.querySelector('form.woocommerce-form-register');
+
+            if (registerForm == null) {
+                return;
+            }
+
+            trackFormSubmit(registerForm, 'form.woocommerce-form-register', 'Register');
+        }
+
+        function watchLogin() {
+            let loginForm = document.querySelector('form.woocommerce-form-login');
+
+            if (loginForm == null) {
+                return;
+            }
+
+            trackFormSubmit(loginForm, 'form.woocommerce-form-login', 'Sign In');
+        }
+
+        function trackFormSubmit(form, id, name) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                await trackSetUserProperties(getUserProperties(form));
+                await trackSignUp(track, id, name);
+
+                form.submit();
+            });
+        }
+
+        function getUserProperties(form) {
+            let usernameField = form.querySelector('input[name="username"]');
+            let emailField = form.querySelector('input[name="email"]');
+
+            if (usernameField != null && usernameField.value) {
+                return {
+                    userId: usernameField.value
+                };
+            }
+
+            return {
+                userId: emailField.value
+            };
+        }
+    };
+}
+
+const accountRegister = track => id => {
+    return trackSignUp(track, id, 'Register');
+};
+
+function trackSignUp(track, id, name) {
+    return track('signUp', {
+        contentType: 'Page',
+        id,
+        name
+    });
+}
+
+
+/***/ }),
+
 /***/ "./js/src/placeOrderWatcher.js":
 /*!*************************************!*\
   !*** ./js/src/placeOrderWatcher.js ***!
@@ -247,7 +332,7 @@ function initCheckoutWatcher(params) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "placeOrderWatcher", function() { return placeOrderWatcher; });
-function placeOrderWatcher(params, trackSetUserProperties) {
+function placeOrderWatcher(params, trackSetUserProperties, trackAccountRegister) {
     return track => {
         let cart = params().cart;
 
@@ -262,8 +347,8 @@ function placeOrderWatcher(params, trackSetUserProperties) {
         }
 
         checkoutForm.addEventListener('submit', () => {
-            debugger
             trackSetUserProperties(getUserProperties());
+            trackAccountRegister('checkout');
             track('initiatePurchase', {
                 currency: params().currency,
                 ...cart
@@ -371,12 +456,12 @@ function purchasedOrderWatcher() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setUserProperties", function() { return setUserProperties; });
-const setUserProperties = (track) => (userProperties) => {
+const setUserProperties = (track) => async (userProperties) => {
     if (userProperties == null) {
         return;
     }
 
-    track('setUserProperties', userProperties);
+    await track('setUserProperties', userProperties);
 };
 
 
