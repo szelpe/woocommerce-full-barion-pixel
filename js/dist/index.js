@@ -190,7 +190,11 @@ function init() {
 
 
 function track(eventName, properties) {
-    bp('track', eventName, properties);
+    try {
+        bp('track', eventName, properties);
+    } catch (e) {
+        console.error(e);
+    }
 
     return new Promise((resolve) => {
         setTimeout(resolve, 400);
@@ -346,14 +350,31 @@ function placeOrderWatcher(params, trackSetUserProperties, trackAccountRegister)
             return;
         }
 
+        watchPaymentMethod();
+
         checkoutForm.addEventListener('submit', () => {
+            trackPaymentMethod(getPaymentMethod(checkoutForm));
             trackSetUserProperties(getUserProperties());
-            trackAccountRegister('checkout');
+            trackAccountRegisterOnCreating();
             track('initiatePurchase', {
                 currency: params().currency,
                 ...cart
             });
         });
+
+        function watchPaymentMethod() {
+            jQuery(document.body).on('payment_method_selected', () => {
+                trackPaymentMethod(getPaymentMethod(checkoutForm));
+            });
+        }
+
+        function trackPaymentMethod(paymentMethod) {
+            return track('addPaymentInfo', {
+                contents: cart.contents,
+                paymentMethod,
+                step: 1
+            });
+        }
 
         function getUserProperties() {
             if (!isAccountCreating()) {
@@ -374,10 +395,22 @@ function placeOrderWatcher(params, trackSetUserProperties, trackAccountRegister)
             };
         }
 
+        function trackAccountRegisterOnCreating() {
+            if (!isAccountCreating()) {
+                return Promise.resolve();
+            }
+
+            return trackAccountRegister('checkout');
+        }
+
         function isAccountCreating() {
             let createAccountCheckbox = document.getElementById('createaccount');
 
             return createAccountCheckbox != null && createAccountCheckbox.checked;
+        }
+
+        function getPaymentMethod(form) {
+            return form.querySelector('input[name="payment_method"]:checked').value;
         }
     }
 }

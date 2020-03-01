@@ -12,14 +12,31 @@ export function placeOrderWatcher(params, trackSetUserProperties, trackAccountRe
             return;
         }
 
+        watchPaymentMethod();
+
         checkoutForm.addEventListener('submit', () => {
+            trackPaymentMethod(getPaymentMethod(checkoutForm));
             trackSetUserProperties(getUserProperties());
-            trackAccountRegister('checkout');
+            trackAccountRegisterOnCreating();
             track('initiatePurchase', {
                 currency: params().currency,
                 ...cart
             });
         });
+
+        function watchPaymentMethod() {
+            jQuery(document.body).on('payment_method_selected', () => {
+                trackPaymentMethod(getPaymentMethod(checkoutForm));
+            });
+        }
+
+        function trackPaymentMethod(paymentMethod) {
+            return track('addPaymentInfo', {
+                contents: cart.contents,
+                paymentMethod,
+                step: 1
+            });
+        }
 
         function getUserProperties() {
             if (!isAccountCreating()) {
@@ -40,10 +57,22 @@ export function placeOrderWatcher(params, trackSetUserProperties, trackAccountRe
             };
         }
 
+        function trackAccountRegisterOnCreating() {
+            if (!isAccountCreating()) {
+                return Promise.resolve();
+            }
+
+            return trackAccountRegister('checkout');
+        }
+
         function isAccountCreating() {
             let createAccountCheckbox = document.getElementById('createaccount');
 
             return createAccountCheckbox != null && createAccountCheckbox.checked;
+        }
+
+        function getPaymentMethod(form) {
+            return form.querySelector('input[name="payment_method"]:checked').value;
         }
     }
 }
