@@ -1,0 +1,15 @@
+{
+  "name": "full-barion-pixel",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Peter Szel <szelpeter@szelpeter.hu>",
+  "license": "GPL-3.0",
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch"
+  },
+  "devDependencies": {
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11"
+  }
+}

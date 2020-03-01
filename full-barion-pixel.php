@@ -30,6 +30,9 @@ class Full_Barion_Pixel_Plugin {
 
         $this->load_plugin_textdomain();
         add_action('woocommerce_barion_init', [$this, 'barion_init'], 10, 2);
+
+        require_once(__DIR__ . '/includes/class-full-barion-pixel-scripts.php');
+        $scripts = new Full_Barion_Pixel_Scripts($this);
     }
 
     function barion_init($barion_client, $gateway) {
