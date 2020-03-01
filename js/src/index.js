@@ -5,7 +5,7 @@ import { purchasedOrderWatcher } from "./purchasedOrderWatcher";
 import { initCheckoutWatcher } from "./initCheckoutWatcher";
 import { placeOrderWatcher } from "./placeOrderWatcher";
 import { setUserProperties } from "./setUserProperties";
-import { myAccountWatcher, accountRegister } from "./myAccountWatcher";
+import { accountRegister, myAccountWatcher } from "./myAccountWatcher";
 
 window.addEventListener('load', init);
 
@@ -29,7 +29,11 @@ function init() {
 
 
 function track(eventName, properties) {
-    bp('track', eventName, properties);
+    try {
+        bp('track', eventName, properties);
+    } catch (e) {
+        console.error(e);
+    }
 
     return new Promise((resolve) => {
         setTimeout(resolve, 400);
