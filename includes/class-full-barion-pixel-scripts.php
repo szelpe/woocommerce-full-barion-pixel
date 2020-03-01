@@ -42,6 +42,10 @@ class Full_Barion_Pixel_Scripts {
             }
         }
 
+        if (is_cart()) {
+            $this->add_cart($params);
+        }
+
         wp_localize_script('full_barion_pixel', 'barionPixelParams', $params);
     }
 
@@ -62,5 +66,34 @@ class Full_Barion_Pixel_Scripts {
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $params
+     */
+    private function add_cart(& $params) {
+        $result = [];
+
+        foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+            $product = apply_filters('woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key);
+            $product_id = apply_filters('woocommerce_cart_item_product_id', $cart_item['product_id'], $cart_item, $cart_item_key);
+
+            array_push($result, [
+                'contentType' => 'Product',
+                'currency' => get_woocommerce_currency(),
+                'id' => (string)$product_id,
+                'name' => $product->get_name(),
+                'quantity' => $cart_item['quantity'],
+                'totalItemPrice' => $cart_item['line_total'],
+                'unit' => 'piece',
+                'unitPrice' => $cart_item['line_subtotal']
+            ]);
+        }
+
+        $params['cart'] = [
+            'contents' => $result,
+            'revenue' => (float)WC()->cart->get_total('raw'),
+            'step' => 0
+        ];
     }
 }

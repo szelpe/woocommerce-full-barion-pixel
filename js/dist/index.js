@@ -98,19 +98,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cartWatcher", function() { return cartWatcher; });
 function cartWatcher(params) {
     return track => {
-        jQuery(document.body).on(
-            'adding_to_cart',
+        jQuery(document.body).on('adding_to_cart',
             (event, button, data) => {
-                console.log(data);
+
                 track('contentView', {
                     contentType: "Product",
                     currency: params().currency,
-                    id: data.product_id,
+                    id: String(data.product_id),
                     name: '', // TODO
                     quantity: data.quantity,
-                    totalItemPrice: '', // TODO
+                    // totalItemPrice: '', // TODO
                     unit: 'piece',
-                    unitPrice: '' // TODO
+                    unitPrice: 0 // TODO
                 });
             }
         );
@@ -156,6 +155,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _cartWatcher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./cartWatcher */ "./js/src/cartWatcher.js");
 /* harmony import */ var _productWatcher__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./productWatcher */ "./js/src/productWatcher.js");
 /* harmony import */ var _purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./purchasedOrderWatcher */ "./js/src/purchasedOrderWatcher.js");
+/* harmony import */ var _initCheckoutWatcher__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./initCheckoutWatcher */ "./js/src/initCheckoutWatcher.js");
+
 
 
 
@@ -170,17 +171,61 @@ function init() {
     }
 
     Object(_consentWatcher__WEBPACK_IMPORTED_MODULE_0__["consentWatcher"])(consent);
-    Object(_cartWatcher__WEBPACK_IMPORTED_MODULE_1__["cartWatcher"])()(track);
+    Object(_cartWatcher__WEBPACK_IMPORTED_MODULE_1__["cartWatcher"])(params)(track);
     Object(_productWatcher__WEBPACK_IMPORTED_MODULE_2__["productWatcher"])()(track);
     Object(_purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__["purchasedOrderWatcher"])()(track);
+    Object(_initCheckoutWatcher__WEBPACK_IMPORTED_MODULE_4__["initCheckoutWatcher"])(params)(track);
 }
 
 function track(eventName, properties) {
     bp('track', eventName, properties);
+
+    return new Promise((resolve) => {
+        setTimeout(resolve, 400);
+    });
 }
 
 function consent(grant) {
     bp('consent', grant);
+}
+
+function params() {
+    return barionPixelParams;
+}
+
+
+/***/ }),
+
+/***/ "./js/src/initCheckoutWatcher.js":
+/*!***************************************!*\
+  !*** ./js/src/initCheckoutWatcher.js ***!
+  \***************************************/
+/*! exports provided: initCheckoutWatcher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initCheckoutWatcher", function() { return initCheckoutWatcher; });
+function initCheckoutWatcher(params) {
+    return (track) => {
+        let cart = params().cart;
+
+        if (cart == null) {
+            return;
+        }
+
+        document.querySelectorAll('.checkout-button')
+            .forEach(el => el.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                await track('initiateCheckout', {
+                    currency: barionPixelParams.currency,
+                    ...cart
+                });
+
+                window.location = e.target.href;
+            }));
+    };
 }
 
 
