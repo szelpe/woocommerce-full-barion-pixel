@@ -181,8 +181,8 @@ function init() {
 
     Object(_consentWatcher__WEBPACK_IMPORTED_MODULE_0__["consentWatcher"])(consent);
     Object(_cartWatcher__WEBPACK_IMPORTED_MODULE_1__["cartWatcher"])(params)(track);
-    Object(_productWatcher__WEBPACK_IMPORTED_MODULE_2__["productWatcher"])()(track);
-    Object(_purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__["purchasedOrderWatcher"])()(track);
+    Object(_productWatcher__WEBPACK_IMPORTED_MODULE_2__["productWatcher"])(params)(track);
+    Object(_purchasedOrderWatcher__WEBPACK_IMPORTED_MODULE_3__["purchasedOrderWatcher"])(params)(track);
     Object(_initCheckoutWatcher__WEBPACK_IMPORTED_MODULE_4__["initCheckoutWatcher"])(params)(track);
     Object(_placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__["placeOrderWatcher"])(params, trackSetUserProperties, trackAccountRegister)(track);
     Object(_myAccountWatcher__WEBPACK_IMPORTED_MODULE_7__["myAccountWatcher"])(params, trackSetUserProperties)(track);
@@ -428,20 +428,18 @@ function placeOrderWatcher(params, trackSetUserProperties, trackAccountRegister)
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "productWatcher", function() { return productWatcher; });
-function productWatcher() {
+function productWatcher(params) {
     return track => {
-        if (typeof barionPixelParams === 'undefined') {
-            return;
-        }
+        let { currency, product } = params();
 
-        if (barionPixelParams.product == null) {
+        if (product == null) {
             return;
         }
 
         track('contentView', {
             contentType: 'Product',
-            currency: barionPixelParams.currency,
-            ...barionPixelParams.product
+            currency,
+            ...product
         });
     };
 }
@@ -459,19 +457,17 @@ function productWatcher() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "purchasedOrderWatcher", function() { return purchasedOrderWatcher; });
-function purchasedOrderWatcher() {
+function purchasedOrderWatcher(params) {
     return track => {
-        if (typeof barionPixelParams === 'undefined') {
-            return;
-        }
+        let { currency, purchasedOrder } = params();
 
-        if (barionPixelParams.purchasedOrder == null) {
+        if (purchasedOrder == null) {
             return;
         }
 
         track('purchase', {
-            currency: barionPixelParams.currency,
-            ...barionPixelParams.purchasedOrder
+            currency,
+            ...purchasedOrder
         });
     };
 }

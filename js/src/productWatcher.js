@@ -1,17 +1,15 @@
-export function productWatcher() {
+export function productWatcher(params) {
     return track => {
-        if (typeof barionPixelParams === 'undefined') {
-            return;
-        }
+        let { currency, product } = params();
 
-        if (barionPixelParams.product == null) {
+        if (product == null) {
             return;
         }
 
         track('contentView', {
             contentType: 'Product',
-            currency: barionPixelParams.currency,
-            ...barionPixelParams.product
+            currency,
+            ...product
         });
     };
 }

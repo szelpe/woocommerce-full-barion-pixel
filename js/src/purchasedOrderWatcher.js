@@ -1,16 +1,14 @@
-export function purchasedOrderWatcher() {
+export function purchasedOrderWatcher(params) {
     return track => {
-        if (typeof barionPixelParams === 'undefined') {
-            return;
-        }
+        let { currency, purchasedOrder } = params();
 
-        if (barionPixelParams.purchasedOrder == null) {
+        if (purchasedOrder == null) {
             return;
         }
 
         track('purchase', {
-            currency: barionPixelParams.currency,
-            ...barionPixelParams.purchasedOrder
+            currency,
+            ...purchasedOrder
         });
     };
 }

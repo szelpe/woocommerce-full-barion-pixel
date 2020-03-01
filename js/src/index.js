@@ -20,8 +20,8 @@ function init() {
 
     consentWatcher(consent);
     cartWatcher(params)(track);
-    productWatcher()(track);
-    purchasedOrderWatcher()(track);
+    productWatcher(params)(track);
+    purchasedOrderWatcher(params)(track);
     initCheckoutWatcher(params)(track);
     placeOrderWatcher(params, trackSetUserProperties, trackAccountRegister)(track);
     myAccountWatcher(params, trackSetUserProperties)(track);
