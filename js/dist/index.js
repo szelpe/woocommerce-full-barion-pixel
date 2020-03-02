@@ -542,20 +542,29 @@ function shopWatcher(params) {
     return track => {
         let { currency } = params();
 
-        // get the tracking input field hidden inside the product link
-        document.querySelectorAll('input[type="hidden"].barion-pixel-tracking-data')
-            .forEach(el => {
+        // There is no real way to find product links => this is a naive implementation: if it's not add to cart, then it's a product link
+        document.querySelectorAll('.products .product')
+            .forEach(productContainer => {
 
-                let productParams = JSON.parse(atob(el.value));
+                let paramsEl = productContainer.querySelector('input[type="hidden"].barion-pixel-tracking-data');
+                let productParams = JSON.parse(atob(paramsEl.value));
 
-                jQuery(el).closest('a').on('click', e => {
-                    track('clickProduct', {
-                        contentType: 'Product',
-                        currency,
-                        ...productParams
-                    });
+                productContainer.querySelectorAll('a').forEach(link => {
+                    if (!isAddToCartLink(link)) {
+                        link.addEventListener('click', () => {
+                            track('clickProduct', {
+                                contentType: 'Product',
+                                currency,
+                                ...productParams
+                            });
+                        });
+                    }
                 });
-            })
+            });
+
+        function isAddToCartLink(link) {
+            return /\?add-to-cart=(\d+)/.test(link.href);
+        }
     };
 }
 
