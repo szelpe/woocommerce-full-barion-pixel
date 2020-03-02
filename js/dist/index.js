@@ -102,15 +102,18 @@ function cartWatcher(params) {
 
         jQuery(document.body).on('adding_to_cart',
             (event, button, data) => {
+                let productId = data.product_id;
+                let paramsEl = document.querySelector('[data-productid="' + productId + '"]');
+
+                let productParams = JSON.parse(atob(paramsEl.value));
+
                 track('addToCart', {
                     contentType: "Product",
                     currency,
-                    id: String(data.product_id),
-                    name: '', // TODO
+                    id: String(productId),
                     quantity: data.quantity,
-                    totalItemPrice: 0, // TODO
-                    unit: 'piece',
-                    unitPrice: 0 // TODO
+                    totalItemPrice: productParams.unitPrice * data.quantity,
+                    ...productParams
                 });
             }
         );
@@ -183,6 +186,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _setUserProperties__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./setUserProperties */ "./js/src/setUserProperties.js");
 /* harmony import */ var _myAccountWatcher__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./myAccountWatcher */ "./js/src/myAccountWatcher.js");
 /* harmony import */ var _variationWatcher__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./variationWatcher */ "./js/src/variationWatcher.js");
+/* harmony import */ var _shopWatcher__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./shopWatcher */ "./js/src/shopWatcher.js");
+
 
 
 
@@ -212,6 +217,7 @@ function init() {
     Object(_placeOrderWatcher__WEBPACK_IMPORTED_MODULE_5__["placeOrderWatcher"])(params, trackSetUserProperties, trackAccountRegister)(track);
     Object(_myAccountWatcher__WEBPACK_IMPORTED_MODULE_7__["myAccountWatcher"])(params, trackSetUserProperties)(track);
     Object(_variationWatcher__WEBPACK_IMPORTED_MODULE_8__["variationWatcher"])(params)(track);
+    Object(_shopWatcher__WEBPACK_IMPORTED_MODULE_9__["shopWatcher"])(params)(track);
 }
 
 
@@ -518,6 +524,40 @@ const setUserProperties = (track) => async (userProperties) => {
 
     await track('setUserProperties', userProperties);
 };
+
+
+/***/ }),
+
+/***/ "./js/src/shopWatcher.js":
+/*!*******************************!*\
+  !*** ./js/src/shopWatcher.js ***!
+  \*******************************/
+/*! exports provided: shopWatcher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "shopWatcher", function() { return shopWatcher; });
+function shopWatcher(params) {
+    return track => {
+        let { currency } = params();
+
+        // get the tracking input field hidden inside the product link
+        document.querySelectorAll('input[type="hidden"].barion-pixel-tracking-data')
+            .forEach(el => {
+
+                let productParams = JSON.parse(atob(el.value));
+
+                jQuery(el).closest('a').on('click', e => {
+                    track('clickProduct', {
+                        contentType: 'Product',
+                        currency,
+                        ...productParams
+                    });
+                });
+            })
+    };
+}
 
 
 /***/ }),

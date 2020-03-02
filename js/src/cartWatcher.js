@@ -4,15 +4,18 @@ export function cartWatcher(params) {
 
         jQuery(document.body).on('adding_to_cart',
             (event, button, data) => {
+                let productId = data.product_id;
+                let paramsEl = document.querySelector('[data-productid="' + productId + '"]');
+
+                let productParams = JSON.parse(atob(paramsEl.value));
+
                 track('addToCart', {
                     contentType: "Product",
                     currency,
-                    id: String(data.product_id),
-                    name: '', // TODO
+                    id: String(productId),
                     quantity: data.quantity,
-                    totalItemPrice: 0, // TODO
-                    unit: 'piece',
-                    unitPrice: 0 // TODO
+                    totalItemPrice: productParams.unitPrice * data.quantity,
+                    ...productParams
                 });
             }
         );

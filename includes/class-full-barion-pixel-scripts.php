@@ -5,8 +5,18 @@ class Full_Barion_Pixel_Scripts {
 
     public function __construct($plugin) {
         add_action('wp_enqueue_scripts', [$this, 'add_scripts']);
+        add_action('woocommerce_before_shop_loop_item', [ $this, 'add_product_tracking_info' ], 20);
         $this->plugin = $plugin;
 
+    }
+
+    public function add_product_tracking_info() {
+        global $product;
+
+        $product_params = $this->get_product_params($product);
+        $values = base64_encode(json_encode($product_params));
+
+        echo '<input type="hidden" value="' . $values . '" data-productid="' . $product->get_id() .'" class="barion-pixel-tracking-data" >';
     }
 
     public function add_scripts() {
@@ -18,13 +28,7 @@ class Full_Barion_Pixel_Scripts {
         if (is_product()) {
             $product = wc_get_product();
 
-            $params['product'] = [
-                'id' => (string)$product->get_id(),
-                'name' => $product->get_formatted_name(),
-                'quantity' => 1,
-                'unit' => 'piece',
-                'unitPrice' => (float)$product->get_price()
-            ];
+            $params['product'] = $this->get_product_params($product);
         }
 
         if (is_order_received_page()) {
@@ -98,6 +102,20 @@ class Full_Barion_Pixel_Scripts {
             'contents' => $result,
             'revenue' => (float)WC()->cart->get_total('raw'),
             'step' => 0
+        ];
+    }
+
+    /**
+     * @param WC_Product $product
+     * @return array
+     */
+    private function get_product_params(WC_Product $product) {
+        return [
+            'id' => (string)$product->get_id(),
+            'name' => $product->get_formatted_name(),
+            'quantity' => 1,
+            'unit' => 'piece',
+            'unitPrice' => (float)$product->get_price()
         ];
     }
 }
