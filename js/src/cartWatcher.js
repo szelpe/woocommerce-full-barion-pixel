@@ -21,7 +21,7 @@ export function cartWatcher(params) {
         );
 
         jQuery(document).on('click', '.woocommerce-cart-form .product-remove > a', (e) => {
-            let { product_sku, product_id } = jQuery(e.target).data();
+            let { product_sku, product_id } = jQuery(e.target).closest('a').data();
             let product = findProductInCart(product_id);
 
             track('removeFromCart', {
