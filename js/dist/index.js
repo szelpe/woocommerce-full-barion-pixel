@@ -543,10 +543,15 @@ function shopWatcher(params) {
         let { currency } = params();
 
         // There is no real way to find product links => this is a naive implementation: if it's not add to cart, then it's a product link
-        document.querySelectorAll('.products .product')
+        document.querySelectorAll('.product')
             .forEach(productContainer => {
 
                 let paramsEl = productContainer.querySelector('input[type="hidden"].barion-pixel-tracking-data');
+
+                if (paramsEl == null) {
+                    return;
+                }
+
                 let productParams = JSON.parse(atob(paramsEl.value));
 
                 productContainer.querySelectorAll('a').forEach(link => {
