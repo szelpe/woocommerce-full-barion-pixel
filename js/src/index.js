@@ -8,6 +8,7 @@ import { setUserProperties } from "./setUserProperties";
 import { accountRegister, myAccountWatcher } from "./myAccountWatcher";
 import { variationWatcher } from "./variationWatcher";
 import { shopWatcher } from "./shopWatcher";
+import { productPageCartWatcher } from "./productPageCartWatcher";
 
 window.addEventListener('load', init);
 
@@ -29,6 +30,7 @@ function init() {
     myAccountWatcher(params, trackSetUserProperties)(track);
     variationWatcher(params)(track);
     shopWatcher(params)(track);
+    productPageCartWatcher(params)(track);
 }
 
 

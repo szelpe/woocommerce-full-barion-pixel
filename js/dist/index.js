@@ -187,6 +187,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _myAccountWatcher__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./myAccountWatcher */ "./js/src/myAccountWatcher.js");
 /* harmony import */ var _variationWatcher__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./variationWatcher */ "./js/src/variationWatcher.js");
 /* harmony import */ var _shopWatcher__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./shopWatcher */ "./js/src/shopWatcher.js");
+/* harmony import */ var _productPageCartWatcher__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./productPageCartWatcher */ "./js/src/productPageCartWatcher.js");
+
 
 
 
@@ -218,6 +220,7 @@ function init() {
     Object(_myAccountWatcher__WEBPACK_IMPORTED_MODULE_7__["myAccountWatcher"])(params, trackSetUserProperties)(track);
     Object(_variationWatcher__WEBPACK_IMPORTED_MODULE_8__["variationWatcher"])(params)(track);
     Object(_shopWatcher__WEBPACK_IMPORTED_MODULE_9__["shopWatcher"])(params)(track);
+    Object(_productPageCartWatcher__WEBPACK_IMPORTED_MODULE_10__["productPageCartWatcher"])(params)(track);
 }
 
 
@@ -445,6 +448,55 @@ function placeOrderWatcher(params, trackSetUserProperties, trackAccountRegister)
             return form.querySelector('input[name="payment_method"]:checked').value;
         }
     }
+}
+
+
+/***/ }),
+
+/***/ "./js/src/productPageCartWatcher.js":
+/*!******************************************!*\
+  !*** ./js/src/productPageCartWatcher.js ***!
+  \******************************************/
+/*! exports provided: productPageCartWatcher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "productPageCartWatcher", function() { return productPageCartWatcher; });
+function productPageCartWatcher(params) {
+    return track => {
+        let { currency, product } = params();
+
+        if (product == null) {
+            return;
+        }
+
+        let form = document.querySelector('form.cart');
+
+        if (form == null) {
+            return;
+        }
+
+        form.addEventListener('submit', () => {
+            let quantity = 1;
+
+            let quantityInput = form.querySelector('[name="quantity"]');
+            if(quantityInput != null) {
+                quantity = Number(quantityInput.value);
+            }
+
+            track('addToCart', {
+                contentType: "Product",
+                currency,
+                id: String(product.id),
+                name: product.name,
+                quantity,
+                totalItemPrice: product.totalItemPrice,
+                unit: 'piece',
+                unitPrice: product.unitPrice
+            });
+        });
+    };
 }
 
 
