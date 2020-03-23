@@ -30,6 +30,15 @@ export function myAccountWatcher(params, trackSetUserProperties) {
                 await trackSetUserProperties(getUserProperties(form));
                 await trackSignUp(track, id, name);
 
+                let submitButton = form.querySelector('button[type="submit"]');
+                let hiddenInput = document.createElement('input');
+
+                hiddenInput.setAttribute('type', 'hidden');
+                hiddenInput.setAttribute('name', submitButton.name);
+                hiddenInput.setAttribute('value', submitButton.value);
+
+                form.append(hiddenInput);
+
                 form.submit();
             });
         }

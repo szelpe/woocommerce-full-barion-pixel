@@ -13,7 +13,7 @@ import { productPageCartWatcher } from "./productPageCartWatcher";
 window.addEventListener('load', init);
 
 function init() {
-    if (bp == null) {
+    if (window.bp == null) {
         console.warn('bp object is not present: Barion Pixel is not loaded.');
         return;
     }
